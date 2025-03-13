@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de Jogadores do CS</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4c542;
+            color: #fff;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            background-color: #f4c542;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #e0b232;
+        }
+
+        .index-col {
+            width: 50px;
+        }
+
+        .status-col {
+            width: 100px;
+        }
+
+        .actions-col {
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Terceiro Exemplo com Vue</h2>
+    <div id="app">
+        <h2>Listagem de Jogadores do CS</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th class="index-col">#</th>
+                    <th>Nickname</th>
+                    <th>Estrelas</th>
+                    <th>Pontos</th>
+                    <th>Data de Nascimento</th>
+                    <th>Senha</th>
+                    <th class="status-col">Status</th>
+                    <th class="actions-col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(j, index) in jogadores" :key="index">
+                    <td class="index-col">{{ index + 1 }}</td>
+                    <td>{{ j.nickname }}</td>
+                    <td>{{ j.qtd_estrela }}</td>
+                    <td>{{ j.qtd_pontos }}</td>
+                    <td>{{ j.data_nascimento }}</td>
+                    <td>{{ j.senha }}</td>
+                    <td class="status-col">
+                        <input type="checkbox" v-model="j.status"> 
+                    </td>
+                    <td class="actions-col">
+                        <div class="buttons">
+                            <button class="btn" @click="alterarJogador(index)">Alterar</button>
+                            <button class="btn" @click="removerJogador(index)">Remover</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <form id="formulario">
+            <h2>Formulário para cadastrar novo jogador</h2>
+            <div class="container">
+                <label>Nickname:</label>
+                <input v-model="novo_jogador.nickname" class="form-control" placeholder="Me edite">
+
+                <label>Estrelas:</label>
+                <input v-model="novo_jogador.qtd_estrela" class="form-control" type="number">
+
+                <label>Quantidade de Pontos:</label>
+                <input v-model="novo_jogador.qtd_pontos" class="form-control" type="number">
+
+                <label>Data de Nascimento:</label>
+                <input v-model="novo_jogador.data_nascimento" class="form-control" type="date">
+
+                <label>Senha:</label>
+                <input v-model="novo_jogador.senha" class="form-control" type="password" maxlength="10" placeholder="digite uma senha de 6 a 10 caracteres">
+            </div>
+
+            <span class="input-group-btn">
+                <button @click="addJogador" class="btn btn-primary" type="button">Adicionar!</button>
+            </span>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var dados = { 
+                jogadores:  [ {nickname: 'joaozinho', qtd_estrela: 5, qtd_pontos: 100, data_nascimento: '1995-02-12', senha: '123456', status: false},    
+                              {nickname: 'ze', qtd_estrela: 12, qtd_pontos: 250, data_nascimento: '1990-05-22', senha: '1234567', status: true},
+                              {nickname: 'bastião', qtd_estrela: 16, qtd_pontos: 300, data_nascimento: '1985-11-14', senha: '777777', status: false},
+                              {nickname: 'romario', qtd_estrela: 19, qtd_pontos: 500, data_nascimento: '1989-09-08', senha: '220220', status: true},
+                              {nickname: 'bebeto', qtd_estrela: 10, qtd_pontos: 150, data_nascimento: '1993-07-20', senha: '222222', status: false},
+                              {nickname: 'cannigia', qtd_estrela: 2, qtd_pontos: 50, data_nascimento: '1998-02-01', senha: '228228', status: true},
+                              {nickname: 'maradona', qtd_estrela: 1, qtd_pontos: 10, data_nascimento: '1992-10-10', senha: '228228', status: false}
+                            ], 
+                novo_jogador: {nickname: '', qtd_estrela: 0, qtd_pontos: 0, data_nascimento: '', senha: '', status: false}
+            };
+
+            new Vue({ 
+                el: '#app', 
+                data: dados,
+                methods: { 
+                    addJogador: function () { 
+                        var input_jogador = this.novo_jogador.nickname.trim(); 
+                        var input_qtd_estrela = this.novo_jogador.qtd_estrela; 
+                        var input_qtd_pontos = this.novo_jogador.qtd_pontos; 
+                        var input_data_nascimento = this.novo_jogador.data_nascimento; 
+                        var input_senha = this.novo_jogador.senha.trim();
+
+                        let erros = [];
+
+                        if (input_jogador.length !== 6) {
+                            erros.push('O nickname deve ter exatamente 6 caracteres.');
+                        }
+
+                        if (input_qtd_estrela < 1 || input_qtd_estrela > 100) {
+                            erros.push('As estrelas devem estar entre 1 e 100.');
+                        }
+
+                        if (input_senha.length < 6 || input_senha.length > 10) {
+                            erros.push('A senha deve ter entre 6 e 10 caracteres.');
+                        }
+
+                        if (erros.length > 0) {
+                            alert(erros.join('\n')); 
+                        }
+
+                        this.jogadores.push({
+                            qtd_estrela: input_qtd_estrela, 
+                            qtd_pontos: input_qtd_pontos,
+                            data_nascimento: input_data_nascimento,
+                            senha: input_senha,
+                            nickname: input_jogador,
+                            status: false
+                        });
+
+                        alert("Cadastro realizado com sucesso! Total de jogadores cadastrados: " + this.jogadores.length);
+                    },
+                    alterarJogador: function(index) {
+                        alert('Alterar jogador: ' + this.jogadores[index].nickname);
+                    },
+                    removerJogador: function(index) {
+                        if (confirm("Tem certeza que deseja remover o jogador?")) {
+                            this.jogadores.splice(index, 1);
+                        }
+                    }
+                }
+            });
+        });
+    </script> 
+</body>
+</html>
