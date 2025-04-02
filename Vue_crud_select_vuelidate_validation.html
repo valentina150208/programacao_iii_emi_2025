@@ -1,0 +1,172 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>CRUD - Gerenciamento de PETs</title>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+        <script src="https://unpkg.com/vuelidate@0.7.4/dist/vuelidate.min.js"></script>
+        <script src="https://unpkg.com/vuelidate@0.7.4/dist/validators.min.js"></script>
+    </head> 
+    <body>         
+        <div id="app" class="container">               
+                <h2>Gerenciamento de PETs</h2>   
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nome</th>
+                            <th>CPF do Tutor</th>
+                            <th>Raça</th>
+                            <th>Data de Nascimento</th>
+                            <th>Vacinação</th>
+                            <th>Valor</th>
+                            <th>Alterar</th>
+                            <th>Remover</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(pet, index) in pets" :key="index">
+                            <td>{{ index + 1 }}</td>
+                            <td>{{ pet.nome }}</td>
+                            <td>{{ pet.cpf_tutor }}</td>
+                            <td>{{ pet.raca }}</td>
+                            <td>{{ pet.data_nascimento }}</td>
+                            <td>{{ pet.vacinado ? 'Sim' : 'Não' }}</td>
+                            <td>{{ pet.valor | currency }}</td>
+                            <td><button @click="editPet(index)" class="btn btn-warning">Alterar</button></td>
+                            <td><button @click="removePet(index)" class="btn btn-danger">Remover</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <form id="formulario" @submit.prevent="addPet($v)">
+                    <h3>Formulário para cadastrar/alterar PET</h3>
+
+                    <div class="form-group">
+                        <label for="inputNome">Nome:</label>
+                        <input type="text" v-model.trim="$v.novo_pet.nome.$model" :class="status($v.novo_pet.nome)" class="form-control" id="inputNome">
+                        <div class="error" v-if="!$v.novo_pet.nome.$pending && !$v.novo_pet.nome.$model">Nome deve ter entre 4 e 12 caracteres.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputCpfTutor">CPF do Tutor:</label>
+                        <input type="text" v-model.trim="$v.novo_pet.cpf_tutor.$model" :class="status($v.novo_pet.cpf_tutor)" class="form-control" id="inputCpfTutor">
+                        <div class="error" v-if="!$v.novo_pet.cpf_tutor.$pending && !$v.novo_pet.cpf_tutor.$model">CPF inválido.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputRaca">Raça:</label>
+                        <input type="text" v-model.trim="$v.novo_pet.raca.$model" :class="status($v.novo_pet.raca)" class="form-control" id="inputRaca">
+                        <div class="error" v-if="!$v.novo_pet.raca.$pending && !$v.novo_pet.raca.$model">Raça é obrigatória.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputDtNascimento">Data de Nascimento:</label>
+                        <input type="date" v-model="$v.novo_pet.data_nascimento.$model" :class="status($v.novo_pet.data_nascimento)" class="form-control" id="inputDtNascimento">
+                        <div class="error" v-if="!$v.novo_pet.data_nascimento.$pending && !$v.novo_pet.data_nascimento.$model">Informe uma data válida (anterior a data atual).</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="checkVacinacao">Vacinação:</label>
+                        <input type="checkbox" v-model="novo_pet.vacinado" id="checkVacinacao">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputValor">Valor:</label>
+                        <input type="number" v-model="$v.novo_pet.valor.$model" :class="status($v.novo_pet.valor)" class="form-control" id="inputValor" min="100">
+                        <div class="error" v-if="!$v.novo_pet.valor.$pending && !$v.novo_pet.valor.$model">Valor deve ser superior a 100,00.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" @click="cleanFormulario" class="btn btn-secondary">Limpar</button>
+                </form>
+
+                <!-- Mensagem de erro geral, quando o formulário está inválido -->
+                <div v-if="formInvalid" class="alert alert-danger" role="alert">
+                    Existem campos inválidos! Verifique os campos destacados.
+                </div>
+        </div>
+
+        <script>
+            $(document).ready(function() {
+                var dados = { 
+                    pets: [
+                        { nome: 'Rex', cpf_tutor: '12345678901', raca: 'Labrador', data_nascimento: '2020-01-01', vacinado: true, valor: 500 }
+                    ],
+                    novo_pet: {
+                        nome: '',
+                        cpf_tutor: '',
+                        raca: '',
+                        data_nascimento: '',
+                        vacinado: false,
+                        valor: 100
+                    },
+                    formInvalid: false // Variável para controlar o estado do formulário
+                };
+
+                Vue.use(window.vuelidate.default);
+                const { required, minLength, minValue, between } = window.validators;
+
+                new Vue({ 
+                    el: '#app', 
+                    data: dados,
+                    validations: {
+                        novo_pet: {
+                            nome: { required, minLength: minLength(4), maxLength: minLength(12) },
+                            cpf_tutor: { required, minLength: minLength(11) },
+                            raca: { required },
+                            data_nascimento: { required, minValue: value => new Date(value) < new Date() },
+                            valor: { required, minValue: minValue(100) }
+                        }
+                    },
+                    methods: { 
+                        status(validation) {
+                            return {
+                                error: validation.$error,
+                                dirty: validation.$dirty
+                            }
+                        },
+                        addPet(v) {
+                            this.formInvalid = false; // Reseta o estado de erro
+
+                            if (!v.$invalid) {
+                                if (this.novo_pet.indice !== undefined) {
+                                    this.pets[this.novo_pet.indice] = { ...this.novo_pet };
+                                    alert('Pet alterado!');
+                                } else {
+                                    this.pets.push({ ...this.novo_pet });
+                                    alert('Pet cadastrado!');
+                                }
+                                this.cleanFormulario();
+                            } else {
+                                this.formInvalid = true; // Marca o formulário como inválido
+                                alert('Existem campos inválidos no formulário!');
+                            }
+                        },
+                        editPet(index) {
+                            this.novo_pet.indice = index;
+                            this.novo_pet.nome = this.pets[index].nome;
+                            this.novo_pet.cpf_tutor = this.pets[index].cpf_tutor;
+                            this.novo_pet.raca = this.pets[index].raca;
+                            this.novo_pet.data_nascimento = this.pets[index].data_nascimento;
+                            this.novo_pet.vacinado = this.pets[index].vacinado;
+                            this.novo_pet.valor = this.pets[index].valor;
+                        },
+                        removePet(index) {
+                            if (confirm('Deseja remover este pet?')) {
+                                this.pets.splice(index, 1);
+                                alert('Pet removido!');
+                            }
+                        },
+                        cleanFormulario() {
+                            this.novo_pet = { nome: '', cpf_tutor: '', raca: '', data_nascimento: '', vacinado: false, valor: 100 };
+                            this.formInvalid = false; // Reseta o estado de erro ao limpar o formulário
+                        }
+                    }
+                });
+            });
+        </script> 
+    </body>
+</html>
