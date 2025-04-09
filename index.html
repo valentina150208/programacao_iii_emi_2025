@@ -1,117 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>FrameWork Vue</title>
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.js"></script>    
-    </head> 
-    <body>
-         <h2>Primeiro Exemplo com Vue</h2>
-         
-            <div id="app">
-                <form id="formulario1">
-                    <h2>Listagem de Jogadores</h2>
-                    <ul>
-                        <li><label>{{jogadores[0].nickname}}</label></li>
-                        <li><label>{{jogadores[1].qtd_estrela}}</label></li>
-                        <li><label>{{jogadores[2].senha}}</label></li>
-                    </ul>  
-                    
-                    <ul id="example-1">
-                        <li v-for="j in jogadores" :key="j.nickname">
-                          {{ j.nickname }} {{ j.senha }} {{ j.qtd_estrela }}
-                        </li>
-                    </ul>
+ <html>
+   <head>
+     <meta charset="utf-8">
+     <title>Título da Página</title>
+   </head> 
+   <body>
+      <h4>Corpo da Página- Exemplo</h4>
+      <div id="app">         
+         <ul>
+             <li><label>Rótulo <span style="color: red;font-weight: bold;">1</span></label></li>
+             <!-- comentario em html -->
+             <li>
+                <select name="carros" id="carros">
+                    <option value="volvo">Volvo</option>
+                    <option value="saab">Saab</option>
+                    <option value="mercedes">Mercedes</option>
+                    <option value="audi">Audi</option>
+                    <option value="fnm" selected>FNM</option>
+                </select>
+            </li>
+            <li><input type="checkbox" value=""></li>
+            <li><input type="checkbox" value="" checked></li>
+            </li>
+             <li><a href="http://gpca.passofundo.ifsul.edu.br/traps/" target="_blank">GPCA</a></li>
+             <li><a href="https://jquery.com/" target="_self">Jquery</a></li>
+             <li><a href="https://vuejs.org/" target="_blank">Vue</a></li>
+             <li><img src="imagens/bike.jpg" alt="Foto de uma bicicleta antiga" width="500" height="600">   </li>
+         </ul>
+      </div>
+      <div id="app2">        
+        <ul>
+            <li><button type="button">Botão</button></li>
+            <li><input type="text"value="caixa de texto"></li>
+            <li><a href="https://www.w3schools.com/tags/att_a_target.asp" target="_self">w3c</a></li>
+        </ul>
+      </div>
+      <form id="formulario1" action="" method="">        
+         <h2>Exemplo de Formuário</h2>
+         <label for="nome">Informe o seu Nome:</label>
+         <input type="text" id="nome" value="">
+         <li><input type="submit"value="submit"></li>
+     </form>
+   </body>
+   <footer>
+        <h2>Rodapé da Página</h2>
+   </footer>
 
-                    <ul id="example-2">
-                        <li v-for="j in jogadores" :key="j.nickname">
-                            <p v-if="j.qtd_estrela > 10">
-                                {{ j.nickname }} {{ j.senha }} {{ j.qtd_estrela }}
-                            </p>
-                            <p v-else>jogador não tem 10 estrelas ...</p>
-                        </li>
-                    </ul>
-
-                    <h2>Listagem de Partidas</h2>                       
-
-                        <table border="1">
-                            <tr><td>Codigo</td>
-                                <td>Data</td>
-                                <td>Jogador</td>
-                                <td>Quantidade de Estrelas</td>
-                            </tr>
-                            <tr v-for="p in partidas" :key="p.codigo">
-                               <td> {{p.codigo}} </td>
-                               <td> {{p.data}}</td>
-                               <td> {{p.jogador.nickname}}</td>
-                               <td> {{p.jogador.qtd_estrela}}</td>
-                            </tr>
-                        </table>
-
-                    <h2>Adicionar Nova Patente</h2>
-                    <label for="patente-codigo">Código da Patente:</label>
-                    <input type="text" v-model="novaPatente.codigo" id="patente-codigo">
-                    <br><br>
-                    <label for="patente-descricao">Descrição da Patente:</label>
-                    <input type="text" v-model="novaPatente.descricao" id="patente-descricao">
-                    <br><br>
-                    <button type="button" @click="adicionarPatente">Adicionar Patente</button>
-                </form>                
-            </div>       
-    </body>
-
-    <script type="text/javascript">
-   
-        $(document).ready(function() {
-            alert('Chegou aqui !! ');
-        
-            var dados = { 
-                jogadores:  [ {nickname: 'joaozinho', qtd_estrela: 5, senha: '123'},    
-                              {nickname: 'ze', qtd_estrela: 12, senha: '456'},
-                              {nickname: 'bastião', qtd_estrela: 16, senha: '777'},
-                              {nickname: 'dede', qtd_estrela: 16, senha: '777'}
-                            ], 
-                patentes:   [ { codigo: '1', descricao: 'Ouro'},    
-                              { codigo: '2', descricao: 'Prata'},
-                              { codigo: '3', descricao: 'Bronze'}
-                            ],
-                partidas:   [{codigo: 1, data: '28/02/2023', 
-                                           jogador: {nickname: 'joaozinho', 
-                                                     qtd_estrela: 5, 
-                                                     senha: '123'}},
-                             {codigo: 2, data: '10/02/2023', 
-                                           jogador: {nickname: 'bastião', 
-                                                     qtd_estrela: 0, 
-                                                     senha: '456'}}                    
-                            ],
-                novaPatente: {
-                    codigo: '',
-                    descricao: ''
-                }                         
-            };
-        
-            new Vue({ 
-                el: '#app', 
-                data: dados,
-                methods: {
-                    adicionarPatente() {
-                        if (this.novaPatente.codigo && this.novaPatente.descricao) {
-                            this.patentes.push({
-                                codigo: this.novaPatente.codigo,
-                                descricao: this.novaPatente.descricao
-                            });
-                            this.novaPatente.codigo = '';
-                            this.novaPatente.descricao = '';
-                        } else {
-                            alert('Por favor, preencha todos os campos.');
-                        }
-                    }
-                }
-            }); 
-    
-        });
-
-    </script> 
-   
-</html>
+ </html>
